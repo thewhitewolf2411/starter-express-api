@@ -4,6 +4,7 @@ module.exports = {
   dbUser: process.env.DB_USER || 'tx',
   dbPassword: process.env.DB_PASSWORD || 'tx',
   dbPort: process.env.DB_PORT || 5432,
+  dbString: 'postgresql://PavaoZornija1:Gxoy6OqwiP1n@ep-steep-poetry-48615223.us-east-2.aws.neon.tech/taxi?sslmode=require',
   port: process.env.PORT || 5000,
   wsPort: process.env.WS_PORT || 7000,
   isDev: process.env.IS_DEV === 'true' || false,

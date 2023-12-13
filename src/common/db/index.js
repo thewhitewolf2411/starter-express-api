@@ -20,6 +20,7 @@ class DB extends WithLogger {
       port: Number(configs.dbPort),
       max: 10,
     })
+    this.dbString = configs.dbString
   }
 
   query(text, params) {
@@ -64,7 +65,7 @@ class DB extends WithLogger {
   }
 
   async getPgClient() {
-    const client = new Client(this.dbConfig)
+    const client = new Client({connectionString: this.dbString})
     await client.connect()
 
     return client
