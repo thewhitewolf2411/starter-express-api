@@ -1,7 +1,7 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable max-len */
-const uuid = require("@common/utils/uuid")
-const convertToCamelCase = require("@common/utils/convertToCamelCase")
+const uuid = require("../../common/utils/uuid")
+const convertToCamelCase = require("../../common/utils/convertToCamelCase")
 
 class OrderRepository {
     constructor(db) {

@@ -1,10 +1,10 @@
 const Joi = require("@hapi/joi")
 
-const validation = require("@common/validation")
-const { WithLogger, classRegistry } = require("@common/classes")
-const JWT = require("@common/utils/jwt")
-const { UnprocessableContentError } = require("@common/error/errorClasses")
-const { ErrorMessages } = require("@common/error/ErrorMessages")
+const validation = require("../../common/validation")
+const { WithLogger, classRegistry } = require("../../common/classes")
+const JWT = require("../../common/utils/jwt")
+const { UnprocessableContentError } = require("../../common/error/errorClasses")
+const { ErrorMessages } = require("../../common/error/ErrorMessages")
 
 const jwt = new JWT()
 

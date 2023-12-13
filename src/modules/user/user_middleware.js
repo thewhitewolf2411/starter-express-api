@@ -1,9 +1,9 @@
 const Joi = require("@hapi/joi")
 
-const validation = require("@common/validation")
-const { WithLogger } = require("@common/classes")
-const { BadRequestError, ForbiddenError } = require("@common/error/errorClasses")
-const { ErrorMessages } = require("@common/error/ErrorMessages")
+const validation = require("../../common/validation")
+const { WithLogger } = require("../../common/classes")
+const { BadRequestError, ForbiddenError } = require("../../common/error/errorClasses")
+const { ErrorMessages } = require("../../common/error/ErrorMessages")
 
 const updateSessionPayload = Joi.object().keys({
   sessionId: Joi.number().required(),

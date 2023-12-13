@@ -1,9 +1,9 @@
 const Joi = require("@hapi/joi")
 const fs = require("fs")
 
-const validation = require("@common/validation")
+const validation = require("../../common/validation")
 
-const { WithLogger } = require("@common/classes")
+const { WithLogger } = require("../../common/classes")
 const { ForbiddenError } = require("../../common/error/errorClasses")
 
 const getRidesForUserPayload = Joi.object().keys({

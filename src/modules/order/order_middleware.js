@@ -1,4 +1,4 @@
-const { WithLogger } = require("@common/classes")
+const { WithLogger } = require("../../common/classes")
 
 class OrderMiddleware extends WithLogger {
 

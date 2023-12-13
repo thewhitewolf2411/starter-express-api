@@ -1,5 +1,5 @@
-const { ErrorMessages } = require("@common/error/ErrorMessages")
-const { isDev } = require("@config")
+const { ErrorMessages } = require("./ErrorMessages")
+const { isDev } = require("../../../config")
 
 class CustomError extends Error {
   status

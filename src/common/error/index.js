@@ -1,4 +1,4 @@
-const logger = require("@common/logger")
+const logger = require("../logger")
 
 exports.errorHandling = (err, req, res, next) => {
   logger.error(err, { body: req.body, user: req.user, endpoint: req.path })

@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken")
 
-const { WithLogger } = require("@common/classes")
-const config = require("@config")
+const { WithLogger } = require("../classes")
+const config = require("../../../config")
 
 const { pubKey, privKey, jwtIssuer, jwtAudience } = config
 

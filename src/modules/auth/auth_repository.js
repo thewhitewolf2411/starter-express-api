@@ -1,5 +1,5 @@
-const { WithLogger } = require("@common/classes")
-const convertToCamelCase = require("@common/utils/convertToCamelCase")
+const { WithLogger } = require("../../common/classes")
+const convertToCamelCase = require("../../common/utils/convertToCamelCase")
 
 class AuthRepository extends WithLogger {
   constructor(db) {

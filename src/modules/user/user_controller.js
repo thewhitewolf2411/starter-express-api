@@ -1,8 +1,8 @@
 /* eslint-disable no-unreachable */
 const Joi = require("@hapi/joi")
 
-const validation = require("@common/validation")
-const { WithLogger } = require("@common/classes")
+const validation = require("../../common/validation")
+const { WithLogger } = require("../../common/classes")
 const { wsPort } = require("../../../config")
 
 const createUserPayload = Joi.object().keys({

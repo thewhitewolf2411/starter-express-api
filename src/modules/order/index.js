@@ -1,4 +1,4 @@
-const { WithLogger } = require("@common/classes")
+const { WithLogger } = require("../../common/classes")
 const OrderRoutes = require("./order_routes")
 const OrderController = require("./order_controller")
 const OrderRepo = require("./order_repository")
