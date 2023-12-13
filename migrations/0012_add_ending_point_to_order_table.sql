@@ -1,0 +1,3 @@
+ALTER TABLE "user".orders
+  ADD COLUMN end_longitude DOUBLE PRECISION,
+  ADD COLUMN end_latitude DOUBLE PRECISION;

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Multimedia chat!</title>
+
+    <script src="http://test-api.dinpsykolog.nu/socket.io/socket.io.js"></script>
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+  </head>
+
+  <body>
+    Hello world!
+
+    <script>
+      $(document).ready(function () {
+        var socket = io(
+          'http://test-api.dinpsykolog.nu/socket?token=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7ImlkIjoiNDYzZWJmYWItMzEwMi00ZWIwLWJlOWMtOTQwNzhmZjlhOTg5In0sImlhdCI6MTU5MTAwMTg0NCwiZXhwIjoxNTkxMDMwNjQ0LCJhdWQiOiJsb2NhbGhvc3Q6NTAwMCIsImlzcyI6IkRQIERpbnBzeWtvbG9nIFNlcnZpY2UifQ.KB1oKyx-T0mrVB04Zf3tQVBCpO4SVcFt0Q0XvvU1clIGy6QeskXiULTmg_FpWWrV3--1uPAkyAUbew3Zp7lgcw'
+        );
+
+        socket.on('connect', () => {
+          console.log('connected!');
+          socket.emit('ready for data', {});
+        });
+
+        socket.on('update', function (data) {
+          console.log(data);
+        });
+      });
+    </script>
+  </body>
+</html>

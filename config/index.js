@@ -1,0 +1,16 @@
+module.exports = {
+  dbHost: process.env.DB_HOST || 'tx',
+  dbDatabase: process.env.DB_DATABASE || 'tx',
+  dbUser: process.env.DB_USER || 'tx',
+  dbPassword: process.env.DB_PASSWORD || 'tx',
+  dbPort: process.env.DB_PORT || 5432,
+  port: process.env.PORT || 5000,
+  wsPort: process.env.WS_PORT || 7000,
+  isDev: process.env.IS_DEV === 'true' || false,
+  isTest: process.env.IS_TEST === 'true' || false,
+  jwtIssuer: 'TaxiApp',
+  jwtAudience: 'AppUsers',
+  apiUrl: process.env.REDIRECT_URL_API || 'http://localhost:5000',
+  pubKey: 'taxiApp',
+  privKey: 'taxiAppProd',
+};

@@ -1,0 +1,39 @@
+{
+  "extends": ["wesbos"],
+  "env": {
+    "es2022": true,
+    "node": true,
+    "jest": true
+  },
+  "ignorePatterns": ["config/*", "migrations/*", "**/*.settings.*", "**/mock*", "**/__tests__/**"],
+  "rules": {
+    "no-continue": "off",
+    "no-console": "warn",
+    "no-throw-literal": "off",
+    "class-methods-use-this": "off",
+    "no-use-before-define": ["error", { "functions": false }],
+    "no-var": "error",
+    "quotes": ["error", "double", { "avoidEscape": true }],
+    "no-unused-vars": ["error", { "destructuredArrayIgnorePattern": "^(.*)(E|e)rr.*$" }],
+    "max-len": ["error", { "code": 120 }],
+    "prettier/prettier": [
+      "warn",
+      {
+        "tabWidth": 2,
+        "semi": false,
+        "singleQuote": false,
+        "printWidth": 120,
+        "endOfLine": "auto"
+      }
+    ]
+  },
+  "settings": {
+    "import/resolver": {
+      "alias": [
+        ["@common", "./src/common"],
+        ["@config", "./config"],
+        ["@modules", "./src/modules"]
+      ]
+    }
+  }
+}
