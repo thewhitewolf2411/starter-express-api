@@ -22,8 +22,6 @@ const router = express.Router()
 
 const { errorHandling } = require("./src/common/error")
 
-const { execSync } = require('child_process')
-
 const server = require("http").createServer(app)
 const io = require("socket.io").listen(server, { origins: "*:*", path: "/socket" })
 
@@ -103,5 +101,4 @@ app.use(errorHandling)
 server.listen(config.port, () => 
     {
         logger.info(`Service is listening on port: ${config.port}`)
-        execSync("npm run db-migrations")
     })
