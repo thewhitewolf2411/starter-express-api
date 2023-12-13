@@ -1,4 +1,4 @@
-const { isDev } = require("@config")
+const { isDev } = require("../../../config")
 
 class ErrorTranslation {
   enUS

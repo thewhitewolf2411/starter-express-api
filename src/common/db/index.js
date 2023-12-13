@@ -1,5 +1,5 @@
 const { Pool, Client } = require("pg")
-const config = require("@config")
+const config = require("../../../config")
 const { WithLogger } = require("../classes")
 
 class DB extends WithLogger {
