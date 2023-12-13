@@ -8,7 +8,7 @@
     "test-watch": "jest --watchAll",
     "start": "node index.js",
     "dev": "nodemon -L --inspect=0.0.0.0 index.js",
-    "db-migrations": "MIGRATIONS_PATH=$PWD/migrations node tools/database/scripts/runMigrations.js",
+    "db-migrations": "node tools/database/scripts/runMigrations.js",
     "db-migrations:windows": "cross-env MIGRATIONS_PATH=$PWD/migrations node tools/database/scripts/runMigrations.js",
     "db-seed-dev": "node tools/database/scripts/seedDevData.js",
     "db-seed-prod": "node tools/database/scripts/seedProdData.js",
