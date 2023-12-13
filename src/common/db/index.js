@@ -13,12 +13,8 @@ class DB extends WithLogger {
       port: Number(configs.dbPort),
     }
     this.pool = new Pool({
-      user: configs.dbUser,
-      host: configs.dbHost,
-      database: configs.dbDatabase,
-      password: configs.dbPassword,
-      port: Number(configs.dbPort),
       max: 10,
+      connectionString: configs.dbString
     })
     this.dbString = configs.dbString
   }
