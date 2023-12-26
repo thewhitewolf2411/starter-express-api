@@ -3,7 +3,7 @@ const Joi = require("@hapi/joi")
 const validation = require("../../common/validation")
 const { WithLogger, classRegistry } = require("../../common/classes")
 const JWT = require("../../common/utils/jwt")
-const { UnprocessableContentError } = require("../../common/error/errorClasses")
+const { UnprocessableContentError, ForbiddenError } = require("../../common/error/errorClasses")
 const { ErrorMessages } = require("../../common/error/ErrorMessages")
 
 const jwt = new JWT()
@@ -19,6 +19,18 @@ const registerPayload = Joi.object().keys({
   email: Joi.string().required(),
   password: Joi.string().required(),
   phoneNumber: Joi.string().required(),
+})
+
+const registerDriverPayload = Joi.object().keys({
+  firstName: Joi.string().required(),
+  lastName: Joi.string().required(),
+  email: Joi.string().required(),
+  password: Joi.string().required(),
+  phoneNumber: Joi.string().required(),
+  carModel: Joi.string().required(),
+  carNumber: Joi.string().required(),
+  shortDesc: Joi.string().required(),
+  longDesc: Joi.string().required()
 })
 
 const signJWT = (signData) => jwt.signKey(signData)
@@ -58,12 +70,39 @@ class AuthController extends WithLogger {
     const { body } = req
 
     const payload = validation.validate(registerPayload, body)
+    const { email } = payload
+
+    const [, user] = await classRegistry.get("User").userByEmail({ email })
+    if (user) throw new ForbiddenError()
 
     try{
       const { id: userId } = await classRegistry.get("User").addTaxiUser(payload)
 
-      const jwtToken = await signJWT({ id: userId })
-      return res.status(200).send({ token: jwtToken })
+      const token = await signJWT({ id: userId })
+      return res.status(200).send({ token })
+    } catch (err) {
+      console.log(err)
+    }
+
+    return res.status(500)
+  }
+
+  async registerDriverHandler(req, res) {
+    const { body } = req
+
+    const payload = validation.validate(registerDriverPayload, body)
+    const { email } = payload
+
+    const [, user] = await classRegistry.get("User").userByEmail({ email })
+    if (user) throw new ForbiddenError()
+
+    try {
+      const [err, driver] = await classRegistry.get("User").addDriverUser(payload)
+      if(err) throw err
+      const { id: userId } = driver
+
+      const token = await signJWT({ id: userId })
+      return res.status(200).send({ token })
     } catch (err) {
       console.log(err)
     }

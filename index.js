@@ -41,7 +41,7 @@ protectedRouter.use((req, res, next) => {
         const { authorization } = headers
 
         const fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
-        if(fullUrl.includes("socket")) return next()
+        if (fullUrl.includes("socket")) return next()
 
         const jwt = new JWT()
 
@@ -98,7 +98,6 @@ app.use("/", protectedRouter)
 
 app.use(errorHandling)
 
-server.listen(config.port, () => 
-    {
-        logger.info(`Service is listening on port: ${config.port}`)
-    })
+server.listen(config.port, () => {
+    logger.info(`Service is listening on port: ${config.port}`)
+})

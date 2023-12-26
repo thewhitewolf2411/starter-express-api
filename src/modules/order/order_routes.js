@@ -30,6 +30,14 @@ class OrderRoutes {
             .route("/ride/current")
             .get((req, res, next) => this.handlers.getCurrentOrderHandler(req, res).catch(next))
 
+        this.protected
+            .route("/ride/current/cancel")
+            .post((req, res, next) => this.handlers.cancelCurrentOrderHandler(req, res).catch(next))
+
+        this.protected
+            .route("/ride/driver/open")
+            .get((req, res, next) => this.handlers.getActiveOrdersHandler(req, res).catch(next))
+
     }
 }
 

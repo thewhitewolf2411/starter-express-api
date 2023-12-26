@@ -9,6 +9,8 @@ class AuthRoutes {
     this.router.route("/auth/login").post((req, res, next) => this.handlers.loginHandler(req, res).catch(next))
     this.router.route("/auth/register").post((req, res, next) => this.handlers.registerHandler(req, res).catch(next))
 
+    this.router.route("/auth/driver/register").post((req, res, next) => this.handlers.registerDriverHandler(req, res).catch(next))
+
     this.router.route("/auth/verify").get((req, res, next) => this.handlers.verifyHandler(req, res).catch(next))
     this.protected.route("/auth/logout").get((req, res, next) => this.handlers.logoutHandler(req, res).catch(next))
   }

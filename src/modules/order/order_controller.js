@@ -4,7 +4,8 @@ const fs = require("fs")
 const validation = require("../../common/validation")
 
 const { WithLogger } = require("../../common/classes")
-const { ForbiddenError } = require("../../common/error/errorClasses")
+const { ForbiddenError, NotFoundError } = require("../../common/error/errorClasses")
+const { ErrorMessages } = require("../../common/error/ErrorMessages")
 
 const getRidesForUserPayload = Joi.object().keys({
     userId: Joi.string().required(),
@@ -53,10 +54,9 @@ class OrderController extends WithLogger {
         const endLatitude = endingCoordinates.lat
 
         const [curError, curRide] = await this.repo.getCurrentOrder({ customerId })
+        if(curError) throw curError
 
         const forbiddenStatuses = [1, 2, 3]
-
-
 
         if (curRide && forbiddenStatuses.includes(curRide.statusId)) {
             res.status(421).send({message: "You already created order"})
@@ -80,9 +80,54 @@ class OrderController extends WithLogger {
 
         if (err) throw err
 
-        if (!ride) res.status(404)
+        if (ride === null) throw new ForbiddenError()
 
         res.status(200).send({ ride })
+    }
+
+    async cancelOrderHandler(req, res){
+        const { orderId } = req.body
+
+        const [err, ride] = await this.repo.cancelCurrentOrder({ orderId })
+
+        if (err) throw err
+
+        if (!ride) res.status(404)
+
+        res.status(200).send({success: true})
+    }
+
+    async getActiveOrdersHandler(req, res){
+        console.log("here")
+        const [err, orders] = await this.repo.getActiveOrders()
+        console.log("orders", orders)
+
+        if (err) throw err
+
+        res.status(200).send({ orders })
+    }
+
+    async acceptActiveOrderHandler(req, res){
+
+        const { orderId } = req.body
+        const { id: driverId } = req.user
+
+        const [err, order] = await this.repo.acceptActiveOrder({ orderId, driverId })
+
+        if (err) throw err
+
+        res.status(201).send({ order })
+    }
+
+    async finishOrderHandler(req, res){
+        const { orderId } = req.body
+        const { id: driverId } = req.user
+
+        const [err, order] = await this.repo.finishOrder({ orderId, driverId })
+
+        if (err) throw err
+
+        res.status(201).send({ order })
     }
 }
 

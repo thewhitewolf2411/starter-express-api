@@ -37,6 +37,23 @@ class UserInterface extends WithLogger {
     return user
   }
 
+  async addDriverUser({ email, firstName, lastName, phoneNumber, password, carModel, carNumber, shortDesc, longDesc }) {
+    let err
+    let user
+
+      ;[err, user] = await this.repo.addDriverUser({ email, firstName, lastName, phoneNumber, password, carModel, carNumber, shortDesc, longDesc })
+
+    if (err) {
+      throw err
+    }
+
+    user = {
+      ...user,
+    }
+
+    return [err, user]
+  }
+
   async userByEmailAndPassword({email, password}){
     let err
     let user
@@ -52,6 +69,13 @@ class UserInterface extends WithLogger {
     }
 
     return user
+  }
+
+  async userByEmail({email}){
+  
+    const [, user] = await this.repo.userByEmail({ email })
+
+    return [null, user]
   }
 
 }
