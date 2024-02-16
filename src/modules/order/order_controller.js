@@ -47,7 +47,7 @@ class OrderController extends WithLogger {
 
     async createOrderHandler(req, res){
         const { id: customerId } = req.user
-        const { startingCoordinates, endingCoordinates, estimatedPrice } = req.body
+        const { startingCoordinates, endingCoordinates, estimatedPrice, isPetFriendly, isCardPayment, reminder } = req.body
         const startLongitude = startingCoordinates.lng
         const startLatitude = startingCoordinates.lat
         const endLongitude = endingCoordinates.lng
@@ -63,7 +63,7 @@ class OrderController extends WithLogger {
             return
         }
 
-        const [err, ride] = await this.repo.createOrder({ customerId, estimatedPrice, startLongitude, startLatitude, endLongitude, endLatitude})
+        const [err, ride] = await this.repo.createOrder({ customerId, estimatedPrice, startLongitude, startLatitude, endLongitude, endLatitude, isPetFriendly, isCardPayment, reminder})
 
         if (ride) process.emit(`order: created`, { ride })
 

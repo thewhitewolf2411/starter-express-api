@@ -4,6 +4,7 @@ const Joi = require("@hapi/joi")
 const validation = require("../../common/validation")
 const { WithLogger } = require("../../common/classes")
 const { wsPort } = require("../../../config")
+const multer = require("multer");
 
 const createUserPayload = Joi.object().keys({
   email: Joi.string().required(),
@@ -106,6 +107,13 @@ class UserController extends WithLogger {
     if (err || error) throw err || error
 
     res.status(200).send(updatedCaregiver)
+  }
+
+  async uploadUserImage(req, res) {
+    console.log(req.file); // File which is uploaded in /uploads folder.
+    console.log(req.body); // Body
+
+    res.status(200).send({ message: "image uploaded" })
   }
 }
 

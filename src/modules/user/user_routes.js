@@ -15,6 +15,10 @@ class UserRoutes {
       .route("/user")
       .get((req, res, next) => this.handlers.getUserByIdHandler(req, res).catch(next))
       .put((req, res, next) => this.handlers.updateUserHandler(req, res).catch(next))
+
+    this.protected
+      .route("/user/image")
+      .post((req, res, next) => this.handlers.uploadUserImage(req, res).catch(next))
   }
 }
 

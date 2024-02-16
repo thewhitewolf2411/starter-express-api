@@ -41,7 +41,7 @@ class OrderRepository {
         }
     }
 
-    async createOrder({customerId, estimatedPrice, startLongitude, startLatitude, endLongitude, endLatitude}){
+    async createOrder({customerId, estimatedPrice, startLongitude, startLatitude, endLongitude, endLatitude, isPetFriendly, isCardPayment, reminder}){
         const createOrderQuery = {
             text: `
                 INSERT INTO "user".orders (
@@ -53,9 +53,12 @@ class OrderRepository {
                     start_longitude,
                     start_latitude,
                     end_longitude,
-                    end_latitude
+                    end_latitude,
+                    pet_friendly,
+                    card_payment,
+                    reminder
                 ) VALUES (
-                    $1, $2, $3, NOW(), NOW(), $4, $5, $6, $7
+                    $1, $2, $3, NOW(), NOW(), $4, $5, $6, $7, $8, $9, $10
                 ) RETURNING *
             `,
             values: [
@@ -65,7 +68,10 @@ class OrderRepository {
                 startLongitude,
                 startLatitude,
                 endLongitude,
-                endLatitude
+                endLatitude,
+                isPetFriendly,
+                isCardPayment,
+                reminder
             ],
         };
 
