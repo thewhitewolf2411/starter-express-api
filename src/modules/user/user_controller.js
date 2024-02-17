@@ -138,7 +138,7 @@ class UserController extends WithLogger {
       Key: `tmp/${file_name}`,
     }).promise();
 
-    let my_file = await s3.getObject({
+    let my_file = await this.s3.getObject({
       Bucket: "cyclic-delightful-hen-umbrella-eu-west-1",
       Key: `tmp/${file_name}`,
     }).promise()
