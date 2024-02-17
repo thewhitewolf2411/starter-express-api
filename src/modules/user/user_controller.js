@@ -143,7 +143,9 @@ class UserController extends WithLogger {
       Key: `tmp/${file_name}`,
     }).promise()
 
-    console.log(url, fields, my_file)
+    console.log(my_file)
+
+    res.sendStatus(200)
 
   }
 }
