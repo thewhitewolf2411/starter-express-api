@@ -136,15 +136,22 @@ class UserController extends WithLogger {
       res.status(200).send({ imageUrl: req.file.location });
     });*/
 
+    const { user } = req;
+    const { userId } = user;
+
+    const generatedKey = userId + Date.now().toString()
+
     const image = await this.s3.putObject({
       Body: JSON.stringify({ key: req.file }),
       Bucket: "cyclic-delightful-hen-umbrella-eu-west-1",
-      Key: "some_files/my_file.json",
+      Key: generatedKey,
     }).promise()
+
+    console.log(image)
 
     const retreivedImage = await this.s3.getObject({
       Bucket: "cyclic-delightful-hen-umbrella-eu-west-1",
-      Key: "some_files/my_file.json",
+      Key: generatedKey,
     }).promise()
 
     console.log(retreivedImage)
