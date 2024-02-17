@@ -5,6 +5,7 @@ const validation = require("../../common/validation")
 const { WithLogger } = require("../../common/classes")
 const { wsPort, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION, AWS_BUCKET } = require("../../../config")
 const aws = require('aws-sdk');
+const { createPresignedPost } = require("aws-sdk");
 const multer = require('multer');
 const multerS3 = require('multer-s3');
 
@@ -126,40 +127,18 @@ class UserController extends WithLogger {
   }
 
   async uploadUserImage(req, res) {
-    /*this.upload.single('image')(req, res, async function (err) {
-      if (err) {
-        console.log(err)
-        return res.status(500).send({ message: "Error uploading image" });
+
+    console.log(req.file)
+    
+    const { url, fields } = await createPresignedPost(this.s3, {
+      Bucket: BUCKET_NAME,
+      Key: `uploads/${file_name}`,
+      Fields: {
+        'Content-Type': file_type
       }
+    });
 
-      // If file is successfully uploaded, send back the S3 URL
-      res.status(200).send({ imageUrl: req.file.location });
-    });*/
-
-    const { user } = req;
-    const { userId } = user;
-
-    const generatedKey = userId + Date.now().toString()
-
-    const image = await this.s3.putObject({
-      Body: JSON.stringify({ key: req.file }),
-      Bucket: "cyclic-delightful-hen-umbrella-eu-west-1",
-      Key: generatedKey,
-    }).promise()
-
-    console.log(image)
-
-    const retreivedImage = await this.s3.getObject({
-      Bucket: "cyclic-delightful-hen-umbrella-eu-west-1",
-      Key: generatedKey,
-    }).promise()
-
-    const download_url = await this.s3.getSignedUrl(this.s3, {
-      Bucket: "cyclic-delightful-hen-umbrella-eu-west-1",
-      Key: generatedKey,
-    })
-
-    console.log(retreivedImage, download_url)
+    console.log(url)
 
   }
 }

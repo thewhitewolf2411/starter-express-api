@@ -1,3 +1,4 @@
+const multer = require('multer')
 class UserRoutes {
   constructor(router, protectedRouter, adminRouter, handlers, middleware) {
     this.router = router
@@ -5,6 +6,18 @@ class UserRoutes {
     this.adminRouter = adminRouter
     this.handlers = handlers
     this.middleware = middleware
+    this.storage = multer.diskStorage({
+      destination: function (req, file, cb) {
+        cb(null, 'tmp/');
+      },
+      filename: function (req, file, cb) {
+        cb(null, file.originalname);
+      }
+    });
+
+    var upload = multer({
+      storage: this.storage
+    }).single("image");
 
     this.protected
       .route("/users/:userId")
@@ -18,7 +31,7 @@ class UserRoutes {
 
     this.protected
       .route("/user/image")
-      .put((req, res, next) => this.handlers.uploadUserImage(req, res).catch(next))
+      .post(upload, (req, res, next) => this.handlers.uploadUserImage(req, res).catch(next))
   }
 }
 
