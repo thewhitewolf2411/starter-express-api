@@ -40,11 +40,7 @@ class UserController extends WithLogger {
     super()
     this.repo = repo
     this.server = server
-    this.s3 = new aws.S3({
-      accessKeyId: AWS_ACCESS_KEY_ID,
-      secretAccessKey: AWS_SECRET_ACCESS_KEY,
-      region: AWS_REGION,
-    });
+    this.s3 = new aws.S3();
 
     this.upload = multer({
       storage: multerS3({
