@@ -46,7 +46,6 @@ class UserController extends WithLogger {
       storage: multerS3({
         s3: this.s3,
         bucket: AWS_BUCKET,
-        acl: 'public-read', // or 'private' depending on your requirements
         metadata: function (req, file, cb) {
           cb(null, { fieldName: file.fieldname });
         },
