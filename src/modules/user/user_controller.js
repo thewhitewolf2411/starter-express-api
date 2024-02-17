@@ -133,12 +133,17 @@ class UserController extends WithLogger {
     const file_name = req.file.originalname
     const file_type = req.file.mimetype
 
-    const { url, fields } = await this.s3.putObject({
+    await this.s3.putObject({
       Bucket: "cyclic-delightful-hen-umbrella-eu-west-1",
       Key: `tmp/${file_name}`,
     }).promise();
 
-    console.log(url, fields)
+    let my_file = await s3.getObject({
+      Bucket: "cyclic-delightful-hen-umbrella-eu-west-1",
+      Key: `tmp/${file_name}`,
+    }).promise()
+
+    console.log(url, fields, my_file)
 
   }
 }
