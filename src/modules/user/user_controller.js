@@ -154,12 +154,12 @@ class UserController extends WithLogger {
       Key: generatedKey,
     }).promise()
 
-    const { url, fields } = this.s3.getSignedUrl(this.s3, {
+    const download_url = await this.s3.getSignedUrl(this.s3, {
       Bucket: "cyclic-delightful-hen-umbrella-eu-west-1",
       Key: generatedKey,
     })
 
-    console.log(retreivedImage, url, fields)
+    console.log(retreivedImage, download_url)
 
   }
 }
