@@ -129,10 +129,13 @@ class UserController extends WithLogger {
   async uploadUserImage(req, res) {
 
     console.log(req.file)
+
+    const file_name = req.file.originalname
+    const file_type = req.file.mimetype
     
     const { url, fields } = await createPresignedPost(this.s3, {
-      Bucket: BUCKET_NAME,
-      Key: `uploads/${file_name}`,
+      Bucket: "cyclic-delightful-hen-umbrella-eu-west-1",
+      Key: `tmp/${file_name}`,
       Fields: {
         'Content-Type': file_type
       }
