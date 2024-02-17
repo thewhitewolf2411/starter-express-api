@@ -1,7 +1,6 @@
 require("module-alias/register")
 
 const express = require("express")
-const multer = require("multer")
 
 const app = express()
 const bcrypt = require("bcryptjs")
@@ -85,15 +84,6 @@ io.on("connection", async (socket) => {
         process.removeListener(orderCreated, eventFunction);
     });
 });
-
-const storage = multer.diskStorage({
-    destination: "./src/uploads/",
-    filename: function (req, file, cb) {
-        cb(null, "SomeImage" + "." + file.originalname.split(".").pop());
-    },
-});
-
-const diskStorage = multer({ storage: storage });
 
 const User = new UserModule(io, server, router, protectedRouter, adminRouter, db)
 const Auth = new AuthModule(router, protectedRouter, db, bcrypt)

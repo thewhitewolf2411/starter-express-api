@@ -18,7 +18,7 @@ class UserRoutes {
 
     this.protected
       .route("/user/image")
-      .post((req, res, next) => this.handlers.uploadUserImage(req, res).catch(next))
+      .put((req, res, next) => this.handlers.uploadUserImage(req, res).catch(next))
   }
 }
 

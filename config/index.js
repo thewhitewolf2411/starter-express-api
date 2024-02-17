@@ -14,4 +14,9 @@ module.exports = {
   apiUrl: process.env.REDIRECT_URL_API || 'http://localhost:5000',
   pubKey: 'taxiApp',
   privKey: 'taxiAppProd',
+  AWS_BUCKET: process.env.AWS_BUCKET || "cyclic-delightful-hen-umbrella-eu-west-1",
+  AWS_REGION: process.env.AWS_REGION,
+  AWS_ACCESS_KEY_ID: process.env.AWS_ACCESS_KEY_ID,
+  AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY,
+  AWS_SESSION_TOKEN: process.env.AWS_SESSION_TOKEN
 };
