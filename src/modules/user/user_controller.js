@@ -132,16 +132,13 @@ class UserController extends WithLogger {
 
     const file_name = req.file.originalname
     const file_type = req.file.mimetype
-    
-    const { url, fields } = await createPresignedPost(this.s3, {
+
+    const { url, fields } = await this.s3.putObject({
       Bucket: "cyclic-delightful-hen-umbrella-eu-west-1",
       Key: `tmp/${file_name}`,
-      Fields: {
-        'Content-Type': file_type
-      }
-    });
+    }).promise();
 
-    console.log(url)
+    console.log(url, fields)
 
   }
 }
