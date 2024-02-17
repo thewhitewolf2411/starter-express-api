@@ -4,11 +4,9 @@ const Joi = require("@hapi/joi")
 const validation = require("../../common/validation")
 const { WithLogger } = require("../../common/classes")
 const { wsPort, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION, AWS_BUCKET } = require("../../../config")
-const { S3Client } = require('@aws-sdk/client-s3');
+const aws = require('aws-sdk');
 const multer = require('multer');
 const multerS3 = require('multer-s3');
-
-console.log(AWS_ACCESS_KEY_ID, AWS_REGION)
 
 const createUserPayload = Joi.object().keys({
   email: Joi.string().required(),
@@ -42,22 +40,16 @@ class UserController extends WithLogger {
     super()
     this.repo = repo
     this.server = server
-    this.s3 = new S3Client({
-      credentials: {
-        accessKeyId: AWS_ACCESS_KEY_ID,
-        secretAccessKey: AWS_SECRET_ACCESS_KEY,
-      },
+    this.s3 = new aws.S3({
+      accessKeyId: AWS_ACCESS_KEY_ID,
+      secretAccessKey: AWS_SECRET_ACCESS_KEY,
       region: AWS_REGION,
-      sslEnabled: false,
-      s3ForcePathStyle: true,
-      signatureVersion: 'v4',
     });
 
     this.upload = multer({
       storage: multerS3({
         s3: this.s3,
         bucket: AWS_BUCKET,
-        contentType: multerS3.AUTO_CONTENT_TYPE,
         acl: 'public-read', // or 'private' depending on your requirements
         metadata: function (req, file, cb) {
           cb(null, { fieldName: file.fieldname });
