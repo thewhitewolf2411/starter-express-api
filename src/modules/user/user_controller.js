@@ -50,7 +50,7 @@ class UserController extends WithLogger {
           cb(null, { fieldName: file.fieldname });
         },
         key: function (req, file, cb) {
-          cb(null, Date.now().toString() + '-' + file.originalname); 
+          cb(null, Date.now().toString() + '-' + file.originalname);
         },
       })
     });
@@ -62,11 +62,11 @@ class UserController extends WithLogger {
 
     let err
     let user
-    ;[err, user] = await this.repo.getUserById(payload)
+      ;[err, user] = await this.repo.getUserById(payload)
 
     if (err) throw err
 
-    res.status(200).send({user})
+    res.status(200).send({ user })
   }
 
   async createUserHandler(req, res) {
@@ -79,7 +79,7 @@ class UserController extends WithLogger {
 
     res.status(200).send(user)
   }
-  
+
   async updateUserHandler(req, res) {
     const { user, body } = req
     const { id: userId } = user
@@ -94,7 +94,7 @@ class UserController extends WithLogger {
       const [updatedUserError, updatedUser] = await this.repo.updateUser(payload)
       if (updatedUserError) throw updatedUserError
 
-      res.status(200).send({updatedUser})
+      res.status(200).send({ updatedUser })
     } catch (error) {
       this.logger.error(error)
       res.status(500).send(error)
@@ -126,7 +126,7 @@ class UserController extends WithLogger {
   }
 
   async uploadUserImage(req, res) {
-    this.upload.single('image')(req, res, async function (err) {
+    /*this.upload.single('image')(req, res, async function (err) {
       if (err) {
         console.log(err)
         return res.status(500).send({ message: "Error uploading image" });
@@ -134,7 +134,21 @@ class UserController extends WithLogger {
 
       // If file is successfully uploaded, send back the S3 URL
       res.status(200).send({ imageUrl: req.file.location });
-    });
+    });*/
+
+    const image = await this.s3.putObject({
+      Body: JSON.stringify({ key: req.file }),
+      Bucket: "cyclic-delightful-hen-umbrella-eu-west-1",
+      Key: "some_files/my_file.json",
+    }).promise()
+
+    const retreivedImage = await this.s3.getObject({
+      Bucket: "cyclic-delightful-hen-umbrella-eu-west-1",
+      Key: "some_files/my_file.json",
+    }).promise()
+
+    console.log(JSON.parse(retreivedImage))
+
   }
 }
 
