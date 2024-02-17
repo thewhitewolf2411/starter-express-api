@@ -147,7 +147,7 @@ class UserController extends WithLogger {
       Key: "some_files/my_file.json",
     }).promise()
 
-    console.log(JSON.parse(retreivedImage))
+    console.log(retreivedImage)
 
   }
 }
