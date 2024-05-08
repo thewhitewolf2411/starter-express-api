@@ -208,6 +208,49 @@ class UserRepository {
       return [e.message, null];
     }
   }
+
+  async addReview({driverId, userId, driverReview, carReview, driveReview}){
+    console.log(driveReview, driverReview, carReview)
+    const query = {
+      text: `INSERT INTO "user".review(driver_id, user_id, driver_review, car_review, drive_review, created_at, updated_at)
+      VALUES($1, $2, $3, $4, $5, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP) RETURNING *;`,
+      values: [driverId, userId, driverReview, carReview, driveReview],
+    };
+
+    try {
+      const { rows } = await this.db.query(query);
+
+      const review = convertToCamelCase(rows).shift();
+
+      return [null, review];
+    } catch (e) {
+      return [e.message, null];
+    }
+  }
+
+  async getDriverReviews({driverId}){
+    const getReviewsQuery = {
+      text: `SELECT * FROM "user".review
+            WHERE driver_id = $1`,
+      values: [
+        driverId,
+      ],
+    };
+
+    try {
+      const { rows } = await this.db.query(getReviewsQuery);
+
+      if (rows.length === 0) {
+        return [null, []]; // Return an empty array if no reviews found
+      }
+
+      const reviews = convertToCamelCase(rows);
+
+      return [null, reviews];
+    } catch (e) {
+      return [e.message, null];
+    }
+  }
 }
 
 module.exports = UserRepository

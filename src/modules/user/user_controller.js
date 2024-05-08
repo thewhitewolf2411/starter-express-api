@@ -36,6 +36,14 @@ const updateCaregiverPayload = Joi.object().keys({
   expertise: Joi.array().items(Joi.string().required()),
 })
 
+const addReviewPayload = Joi.object().keys({
+  userId: Joi.string().required(),
+  driverId: Joi.string().required(),
+  driverReview: Joi.number().required(),
+  carReview: Joi.number().required(),
+  driveReview: Joi.number().required(),
+})
+
 class UserController extends WithLogger {
   constructor(repo, server) {
     super()
@@ -143,9 +151,68 @@ class UserController extends WithLogger {
       Key: `tmp/${file_name}`,
     }).promise()
 
-    console.log(my_file)
-
     res.sendStatus(200)
+  }
+
+  async getDriverReviews(req, res) {
+    const { driverId } = req.params
+
+    try {
+      const [reviewsError, reviews] = await this.repo.getDriverReviews({driverId})
+      
+      if (reviewsError) throw reviewsError
+
+      console.log(reviews.length)
+
+      let avgDriverReview = 0;
+      let avgCarReview = 0;
+      let avgDriveReview = 0;
+
+      if (reviews.length > 0) {
+        reviews.forEach((review) => {
+          const { driverReview, carReview, driveReview } = review;
+
+          avgDriverReview += driverReview;
+          avgCarReview += carReview;
+          avgDriveReview += driveReview;
+        })
+
+        avgDriverReview = avgDriverReview / reviews.length;
+        avgCarReview = avgCarReview / reviews.length;
+        avgDriveReview = avgDriveReview / reviews.length;
+
+        res.status(200).send({ reviews, avgDriverReview, avgCarReview, avgDriveReview })
+      } else {
+        res.status(200).send({ reviews })
+      }
+    } catch (error) {
+      this.logger.error(error)
+      res.status(500).send(error)
+    }
+  }
+
+  async postDriverReview(req, res) {
+    const { driverId } = req.params
+    const { user, body } = req
+    const { id: userId } = user
+    const toValidate = {
+      userId,
+      driverId,
+      ...body,
+    }
+
+    const payload = validation.validate(addReviewPayload, toValidate)
+
+    try {
+      const [reviewError, review] = await this.repo.addReview(payload)
+      if (reviewError) throw reviewError
+
+      res.status(200).send({ review })
+
+    } catch (error) {
+      this.logger.error(error)
+      res.status(500).send(error)
+    }
 
   }
 }

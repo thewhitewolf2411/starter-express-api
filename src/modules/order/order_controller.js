@@ -98,9 +98,7 @@ class OrderController extends WithLogger {
     }
 
     async getActiveOrdersHandler(req, res){
-        console.log("here")
         const [err, orders] = await this.repo.getActiveOrders()
-        console.log("orders", orders)
 
         if (err) throw err
 

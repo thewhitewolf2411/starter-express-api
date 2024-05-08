@@ -139,22 +139,30 @@ class OrderRepository {
     async getActiveOrders(){
         const query = {
             text: `
-                SELECT id,
-                customer_id,
-                driver_id,
-                canceled,
-                is_successful_payment,
-                estimated_price,
-                exact_price,
-                created_at,
-                updated_at,
-                start_longitude,
-                start_latitude,
-                end_longitude,
-                end_latitude,
-                status_id
-                FROM "user".orders
-                WHERE status_id = 1;`
+                SELECT o.id,
+                o.customer_id,
+                o.driver_id,
+                o.canceled,
+                o.is_successful_payment,
+                o.estimated_price,
+                o.exact_price,
+                o.created_at,
+                o.updated_at,
+                o.start_longitude,
+                o.start_latitude,
+                o.end_longitude,
+                o.end_latitude,
+                o.status_id,
+                o.pet_friendly,
+                o.card_payment,
+                o.reminder,
+                u.first_name,
+                u.last_name,
+                u.phone_number,
+                u.email
+                FROM "user".orders o
+                LEFT JOIN "user".users u ON o.customer_id = u.id
+                WHERE o.status_id = 1;`
         };
 
         try {

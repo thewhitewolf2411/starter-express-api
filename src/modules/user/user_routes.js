@@ -32,6 +32,11 @@ class UserRoutes {
     this.protected
       .route("/user/image")
       .post(upload, (req, res, next) => this.handlers.uploadUserImage(req, res).catch(next))
+
+    this.protected
+      .route("/driver/:driverId/review")
+      .get((req, res, next) => this.handlers.getDriverReviews(req, res).catch(next))
+      .post((req, res, next) => this.handlers.postDriverReview(req, res).catch(next))
   }
 }
 
