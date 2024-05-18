@@ -15,6 +15,7 @@ const JWT = require("./src/common/utils/jwt")
 const AuthModule = require("./src/modules/auth")
 const UserModule = require("./src/modules/user")
 const OrderModule = require("./src/modules/order")
+const PaymentModule = require("./src/modules/payment")
 
 const protectedRouter = express.Router()
 const adminRouter = express.Router()
@@ -88,10 +89,12 @@ io.on("connection", async (socket) => {
 const User = new UserModule(io, server, router, protectedRouter, adminRouter, db)
 const Auth = new AuthModule(router, protectedRouter, db, bcrypt)
 const Order = new OrderModule(router, protectedRouter, adminRouter, db)
+const Payment = new PaymentModule(router, protectedRouter, adminRouter, db)
 
 classRegistry.register("Auth", Auth)
 classRegistry.register("User", User)
 classRegistry.register("Order", Order)
+classRegistry.register("Payment", Payment)
 
 app.use("/", router)
 app.use("/", protectedRouter)

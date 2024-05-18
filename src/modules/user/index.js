@@ -78,6 +78,19 @@ class UserInterface extends WithLogger {
     return [null, user]
   }
 
+  async getUserById({ userId }) {
+
+    const [, user] = await this.repo.getUserById({ userId })
+
+    return [null, user]
+  }
+
+  async getDriverById({ userId }) {
+    const [, driver] = await this.repo.getDriverById({ userId })
+
+    return [null, driver]
+  }
+
 }
 
 module.exports = UserInterface

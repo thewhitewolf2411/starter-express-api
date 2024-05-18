@@ -93,12 +93,42 @@ class OrderRepository {
                 SELECT * FROM "user".orders
                 WHERE customer_id = $1
                 AND canceled = $2
+                AND is_successful_payment = $3
                 ORDER BY created_at DESC
                 LIMIT 1
             `,
             values: [
                 customerId,
+                false,
                 false
+            ],
+        };
+
+        try {
+            const { rows } = await this.db.query(getCurrentOrderQuery);
+
+            const newOrder = convertToCamelCase(rows[0]);
+
+            return [null, newOrder];
+        } catch (e) {
+            return [e.message, null];
+        }
+    }
+
+    async getCurrentDriverOrder({ driverId }){
+        const getCurrentOrderQuery = {
+            text: `
+                SELECT * FROM "user".orders
+                WHERE driver_id = $1
+                AND canceled = $2
+                AND ride_ended = $3
+                ORDER BY created_at DESC
+                LIMIT 1
+            `,
+            values: [
+                driverId,
+                false,
+                null
             ],
         };
 
@@ -177,8 +207,28 @@ class OrderRepository {
         }
     }
 
+    async getOrderById({orderId}){
+        const getQuery = {
+            text: `SELECT * FROM "user".orders WHERE id = $1 LIMIT 1`,
+            values: [orderId]
+        };
+
+        try {
+            const { rows: orderRow } = await this.db.query(getQuery);
+
+            if (orderRow.length > 0) {
+                const order = convertToCamelCase(orderRow[0]);
+                return [null, order];
+            } else {
+                return [null, null];
+            }
+        } catch (e) {
+            console.error('Error querying order:', e);
+            return [e.message, null];
+        }
+    }
+
     async acceptActiveOrder({ orderId, driverId }){
-        // Update user based on ID
         const updateQuery = {
             text: `UPDATE "user".orders
              SET driver_id = $2, status_id = $3
@@ -187,12 +237,105 @@ class OrderRepository {
             values: [
                 orderId,
                 driverId,
-                3,
+                2, // need to put 2
             ],
         };
 
-        const { rows: updateRows } = await this.db.query(updateQuery);
-        const updatedUserResult = convertToCamelCase(updateRows[0]);
+        try {
+            const { rows: updateRows } = await this.db.query(updateQuery);
+
+            if (updateRows.length > 0) {
+                const order = convertToCamelCase(updateRows[0]);
+                return [null, order];
+            } else {
+                return [null, null];
+            }
+        } catch (e) {
+            console.error('Error querying order:', e);
+            return [e.message, null];
+        }
+    }
+
+    async startActiveOrder({ orderId }) {
+        const updateQuery = {
+            text: `UPDATE "user".orders
+             SET status_id = $2
+             WHERE id = $1
+             RETURNING *`,
+            values: [
+                orderId,
+                3, // need to put 3
+            ],
+        };
+
+        try {
+            const { rows: updateRows } = await this.db.query(updateQuery);
+
+            if (updateRows.length > 0) {
+                const order = convertToCamelCase(updateRows[0]);
+                return [null, order];
+            } else {
+                return [null, null];
+            }
+        } catch (e) {
+            console.error('Error querying order:', e);
+            return [e.message, null];
+        }
+    }
+
+    async endActiveOrder({ orderId }) {
+        const updateQuery = {
+            text: `UPDATE "user".orders
+             SET status_id = $2
+             WHERE id = $1
+             RETURNING *`,
+            values: [
+                orderId,
+                4, // need to put 3
+            ],
+        };
+
+        try {
+            const { rows: updateRows } = await this.db.query(updateQuery);
+
+            if (updateRows.length > 0) {
+                const order = convertToCamelCase(updateRows[0]);
+                return [null, order];
+            } else {
+                return [null, null];
+            }
+        } catch (e) {
+            console.error('Error querying order:', e);
+            return [e.message, null];
+        }
+    }
+
+    async setOrderAsFinished({ orderId, isPaid, exactPrice }){
+        const updateQuery = {
+            text: `UPDATE "user".orders
+             SET is_successful_payment = $2, exact_price = $3, ride_ended = CURRENT_TIMESTAMP
+             WHERE id = $1
+             RETURNING *`,
+            values: [
+                orderId,
+                isPaid,
+                exactPrice
+            ],
+        };
+
+        try {
+            const { rows: updateRows } = await this.db.query(updateQuery);
+
+            if (updateRows.length > 0) {
+                const order = convertToCamelCase(updateRows[0]);
+                return [null, order];
+            } else {
+                return [null, null];
+            }
+        } catch (e) {
+            console.error('Error querying order:', e);
+            return [e.message, null];
+        }
     }
 }
 

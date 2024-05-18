@@ -20,7 +20,23 @@ class OrderRoutes {
 
         this.protected
             .route("/ride/:rideId/accept")
-            .post((req, res, next) => this.handlers.acceptOrderHandler(req, res).catch(next))
+            .post((req, res, next) => this.handlers.acceptActiveOrderHandler(req, res).catch(next))
+
+        this.protected
+            .route("/ride/:rideId/start")
+            .post((req, res, next) => this.handlers.startActiveOrderHandler(req, res).catch(next))
+
+        this.protected
+            .route("/ride/:rideId/finish")
+            .post((req, res, next) => this.handlers.finishActiveOrderHandler(req, res).catch(next))
+
+        this.protected
+            .route("/ride/:rideId/end")
+            .post((req, res, next) => this.handlers.endActiveOrderHandler(req, res).catch(next))
+
+        this.protected
+            .route("/ride/:rideId/paid")
+            .post((req, res, next) => this.handlers.setPaidActiveOrderHandler(req, res).catch(next))
 
         this.protected
             .route("/ride/:rideId/cancel")

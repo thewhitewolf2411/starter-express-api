@@ -3,7 +3,7 @@ const fs = require("fs")
 
 const validation = require("../../common/validation")
 
-const { WithLogger } = require("../../common/classes")
+const { WithLogger, classRegistry } = require("../../common/classes")
 const { ForbiddenError, NotFoundError } = require("../../common/error/errorClasses")
 const { ErrorMessages } = require("../../common/error/ErrorMessages")
 
@@ -74,15 +74,27 @@ class OrderController extends WithLogger {
 
     async getCurrentOrderHandler(req, res){
 
-        const { id: customerId } = req.user
+        const { id: userId } = req.user
 
-        const [err, ride] = await this.repo.getCurrentOrder({ customerId })
+        let [err, ride] = [null, null];
+
+        const isDriver = await this.isUserDriver(userId)
+
+        if (isDriver) [err, ride] = await this.repo.getCurrentDriverOrder({ driverId: userId })
+        else [err, ride] = await this.repo.getCurrentOrder({ customerId: userId })
 
         if (err) throw err
 
-        if (ride === null) throw new ForbiddenError()
-
         res.status(200).send({ ride })
+    }
+
+    async isUserDriver(userId){
+
+        const [, driver] = await classRegistry.get("User").getDriverById({ userId })
+
+        if (driver) return true
+
+        return false
     }
 
     async cancelOrderHandler(req, res){
@@ -107,25 +119,78 @@ class OrderController extends WithLogger {
 
     async acceptActiveOrderHandler(req, res){
 
-        const { orderId } = req.body
+        const { rideId: orderId } = req.params
         const { id: driverId } = req.user
 
-        const [err, order] = await this.repo.acceptActiveOrder({ orderId, driverId })
-
+        const [err, order] = await this.repo.getOrderById({ orderId })
         if (err) throw err
+        const { statusId } = order
 
-        res.status(201).send({ order })
+        if (statusId === 1) {
+            const [acceptedOrderError, acceptedOrder] = await this.repo.acceptActiveOrder({ orderId, driverId })
+            res.status(201).send({ acceptedOrder })
+            return
+        }
+
+        res.status(401).send({message: "Order already accepted"})
     }
 
-    async finishOrderHandler(req, res){
-        const { orderId } = req.body
+    async startActiveOrderHandler(req, res){
+        const { rideId: orderId } = req.params
         const { id: driverId } = req.user
 
-        const [err, order] = await this.repo.finishOrder({ orderId, driverId })
-
+        const [err, order] = await this.repo.getOrderById({ orderId })
         if (err) throw err
+        const { statusId, driverId: orderDriverId } = order
 
-        res.status(201).send({ order })
+        if(statusId === 2 && orderDriverId === driverId) {
+            const [startedOrderError, startedOrder] = await this.repo.startActiveOrder({ orderId })
+            res.status(201).send({ startedOrder })
+            return
+        }
+
+        res.status(400).send({message: "Something went wrong"})
+    }
+
+    async finishActiveOrderHandler(req, res){
+        const { rideId: orderId } = req.params
+        const { id: driverId } = req.user
+
+        const [err, order] = await this.repo.getOrderById({ orderId })
+        if (err) throw err
+        const { statusId, driverId: orderDriverId } = order
+
+        if (statusId === 3 && orderDriverId === driverId) {
+            const [finishedOrderError, finishedOrder] = await this.repo.endActiveOrder({ orderId })
+            res.status(201).send({ finishedOrder })
+            return
+        }
+
+        res.status(400).send({ message: "Something went wrong" })
+    }
+
+    async endActiveOrderHandler(req, res){
+        const { rideId: orderId } = req.params
+        const { id: driverId } = req.user
+        const { exactPrice } = req.body
+
+        const [err, order] = await this.repo.getOrderById({ orderId })
+        if (err) throw err
+        const { statusId, driverId: orderDriverId } = order
+
+        const isPaid = !order.cardPayment
+
+        console.log(orderId, isPaid, exactPrice)
+
+        if (statusId === 4 && orderDriverId === driverId) {
+            const [finishedOrderError, finishedOrder] = await this.repo.setOrderAsFinished({ orderId, isPaid, exactPrice })
+            res.status(201).send({ finishedOrder })
+            return
+        }
+
+        res.status(200)
+        return
+        res.status(400).send({ message: "Something went wrong" })
     }
 }
 

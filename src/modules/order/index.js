@@ -17,6 +17,12 @@ class OrderInterface extends WithLogger {
         this.handlers = new OrderController(this.repo)
         this.routes = new OrderRoutes(this.router, this.protectedRouter, this.adminRouter, this.handlers, this.middleware)
     }
+
+    async getOrderById(orderId){
+        const [err, order] = await this.repo.getOrderById({ orderId })
+
+        return order;
+    }
 }
 
 module.exports = OrderInterface

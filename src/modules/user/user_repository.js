@@ -145,9 +145,32 @@ class UserRepository {
 
   async getUserById({ userId }){
     const query = {
-      text: `SELECT id, email, first_name, last_name, phone_number, created_at, updated_at
+      text: `SELECT *
            FROM "user".users
            WHERE id = $1
+           LIMIT 1`,
+      values: [userId],
+    };
+
+    try {
+      const { rows } = await this.db.query(query);
+
+      if (rows.length === 0) {
+        return ["User not found", null];
+      }
+
+      const user = convertToCamelCase(rows[0]);
+      return [null, user];
+    } catch (e) {
+      return [e.message, null];
+    }
+  }
+
+  async getDriverById({ userId }){
+    const query = {
+      text: `SELECT *
+           FROM "user".drivers
+           WHERE user_id = $1
            LIMIT 1`,
       values: [userId],
     };
