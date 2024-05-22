@@ -121,14 +121,13 @@ class OrderRepository {
                 SELECT * FROM "user".orders
                 WHERE driver_id = $1
                 AND canceled = $2
-                AND ride_ended = $3
+                AND ride_ended IS NULL
                 ORDER BY created_at DESC
                 LIMIT 1
             `,
             values: [
                 driverId,
                 false,
-                null
             ],
         };
 
