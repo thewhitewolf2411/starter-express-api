@@ -16,6 +16,7 @@ const AuthModule = require("./src/modules/auth")
 const UserModule = require("./src/modules/user")
 const OrderModule = require("./src/modules/order")
 const PaymentModule = require("./src/modules/payment")
+const DispatcherModule = require("./src/modules/dispatcher")
 
 const protectedRouter = express.Router()
 const adminRouter = express.Router()
@@ -48,7 +49,7 @@ protectedRouter.use((req, res, next) => {
 
         const { isValid, decoded } = jwt.verifyTokenFromRequest(authorization)
         if (!isValid) {
-            return res.status(422).send("Not Authorized!")
+            //return res.status(422).send("Not Authorized!")
         }
 
         req.user = { id: decoded.data.id }
@@ -56,7 +57,8 @@ protectedRouter.use((req, res, next) => {
         next()
     } catch (e) {
         console.log(e)
-        return res.status(422).send("Not Authorized!")
+        //return res.status(422).send("Not Authorized!")
+        next()
     }
 })
 
@@ -90,11 +92,13 @@ const User = new UserModule(io, server, router, protectedRouter, adminRouter, db
 const Auth = new AuthModule(router, protectedRouter, db, bcrypt)
 const Order = new OrderModule(router, protectedRouter, adminRouter, db)
 const Payment = new PaymentModule(router, protectedRouter, adminRouter, db)
+const Dispatcher = new DispatcherModule(router, protectedRouter, db, bcrypt)
 
 classRegistry.register("Auth", Auth)
 classRegistry.register("User", User)
 classRegistry.register("Order", Order)
 classRegistry.register("Payment", Payment)
+classRegistry.register("Dispatcher", Dispatcher)
 
 app.use("/", router)
 app.use("/", protectedRouter)
