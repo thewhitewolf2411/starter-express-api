@@ -49,7 +49,7 @@ protectedRouter.use((req, res, next) => {
 
         const { isValid, decoded } = jwt.verifyTokenFromRequest(authorization)
         if (!isValid) {
-            //return res.status(422).send("Not Authorized!")
+            return res.status(422).send("Not Authorized!")
         }
 
         req.user = { id: decoded.data.id }
@@ -57,8 +57,7 @@ protectedRouter.use((req, res, next) => {
         next()
     } catch (e) {
         console.log(e)
-        //return res.status(422).send("Not Authorized!")
-        next()
+        return res.status(422).send("Not Authorized!")
     }
 })
 
