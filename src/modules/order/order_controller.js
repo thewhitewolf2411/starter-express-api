@@ -128,6 +128,7 @@ class OrderController extends WithLogger {
 
         if (statusId === 1) {
             const [acceptedOrderError, acceptedOrder] = await this.repo.acceptActiveOrder({ orderId, driverId })
+            if (acceptedOrder) process.emit(`${acceptedOrder.customerId}.order: accepted`, { acceptedOrder })
             res.status(201).send({ acceptedOrder })
             return
         }
@@ -145,6 +146,7 @@ class OrderController extends WithLogger {
 
         if(statusId === 2 && orderDriverId === driverId) {
             const [startedOrderError, startedOrder] = await this.repo.startActiveOrder({ orderId })
+            if (startedOrder) process.emit(`${startedOrder.customerId}.order: started`, { startedOrder })
             res.status(201).send({ startedOrder })
             return
         }
@@ -162,6 +164,7 @@ class OrderController extends WithLogger {
 
         if (statusId === 3 && orderDriverId === driverId) {
             const [finishedOrderError, finishedOrder] = await this.repo.endActiveOrder({ orderId })
+            if (finishedOrder) process.emit(`${finishedOrder.customerId}.order: finished`, { finishedOrder })
             res.status(201).send({ finishedOrder })
             return
         }
@@ -180,17 +183,15 @@ class OrderController extends WithLogger {
 
         const isPaid = !order.cardPayment
 
-        console.log(orderId, isPaid, exactPrice)
-
         if (statusId === 4 && orderDriverId === driverId) {
             const [finishedOrderError, finishedOrder] = await this.repo.setOrderAsFinished({ orderId, isPaid, exactPrice })
+            if (finishedOrder) process.emit(`${finishedOrder.customerId}.order: ended`, { finishedOrder })
             res.status(201).send({ finishedOrder })
             return
         }
 
         res.status(200)
         return
-        res.status(400).send({ message: "Something went wrong" })
     }
 }
 

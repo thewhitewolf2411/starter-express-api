@@ -18,5 +18,8 @@ module.exports = {
   AWS_REGION: process.env.AWS_REGION,
   AWS_ACCESS_KEY_ID: process.env.AWS_ACCESS_KEY_ID,
   AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY,
-  AWS_SESSION_TOKEN: process.env.AWS_SESSION_TOKEN
+  AWS_SESSION_TOKEN: process.env.AWS_SESSION_TOKEN,
+  MONRI_URL: 'https://ipgtest.monri.com',
+  MONRI_KEY: ' key-b84363ffa3b6448663f3f9f3dee6ff6a',
+  MONRI_AUTH_TOKEN: '40d23add07f9ddcdb67512ea35e24799b35921e3'
 };

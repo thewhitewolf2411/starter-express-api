@@ -11,6 +11,8 @@ const { httpLogger } = require("./src/common/middlewares")
 const logger = require("./src/common/logger")
 const db = require("./src/common/db")
 const JWT = require("./src/common/utils/jwt")
+const { Server } = require("socket.io")
+const { createServer } = require('node:http')
 
 const AuthModule = require("./src/modules/auth")
 const UserModule = require("./src/modules/user")
@@ -24,8 +26,8 @@ const router = express.Router()
 
 const { errorHandling } = require("./src/common/error")
 
-const server = require("http").createServer(app)
-const io = require("socket.io").listen(server, { origins: "*:*", path: "/socket" })
+const server = createServer(app)
+const io = new Server(server)
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
@@ -43,7 +45,6 @@ protectedRouter.use((req, res, next) => {
         const { authorization } = headers
 
         const fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
-        if (fullUrl.includes("socket")) return next()
 
         const jwt = new JWT()
 
@@ -61,31 +62,87 @@ protectedRouter.use((req, res, next) => {
     }
 })
 
-function registerEventListenerIfAbsent(eventName, eventFunction) {
-    const existingListeners = process.listeners(eventName);
-    const isFunctionRegistered = existingListeners.some((listener) => listener === eventFunction);
+io.use((socket, next) => {
+    const { token } = socket.handshake.query
+    try {
+        const jwt = new JWT()
+        const { isValid, decoded } = jwt.verifyTokenFromRequest(token)
 
-    if (!isFunctionRegistered) {
-        process.on(eventName, eventFunction);
+        if (!isValid) throw new Error("Invalid token")
+        
+        socket.user = { id: decoded.data.id }
+        classRegistry
+            .get("User")
+            .repo.getDriverById({ userId: decoded.data.id })
+            .then(([err, user]) => {
+                socket.user.role = user ? "driver" : "user"
+                next()
+            })
+    } catch (e) {
+        console.log(e)
+        socket.disconnect()
+    }
+})
+
+function registerEventListenerIfAbsent(eventName, eventFunction) {
+    console.log(123)
+    if (!process.listeners(eventName).some((listener) => listener.toString() === eventFunction.toString())) {
+        process.on(eventName, eventFunction)
     }
 }
 
 io.on("connection", async (socket) => {
-    const orderCreated = `order: created`;
+    socket.emit("connected", { connected: true })
+    let orderCreatedByUserEvent
 
-    const eventFunction = (data) => socket.emit(orderCreated, data);
-    registerEventListenerIfAbsent(orderCreated, eventFunction);
+    if (socket.user.role === "driver") {
+        process.on('order: created', () => {
+            socket.emit('order: created')
+        })
+        process.on('order: accepted', () => {
+            socket.emit('order: accepted')
+        })
+        process.on('order: started', () => {
+            socket.emit('order: started')
+        })
+        process.on('order: finished', () => {
+            socket.emit('order: finished')
+        })
+    }
 
-    socket.emit("connected", { connected: true });
+    if (socket.user.role === "user") {
+        process.on(`${socket.user.id}.order: accepted`, () => {
+            socket.emit('order: accepted')
+        })
+        process.on(`${socket.user.id}.order: started`, () => {
+            socket.emit('order: started')
+        })
+        process.on(`${socket.user.id}.order: ended`, () => {
+            socket.emit('order: ended')
+        })
+        process.on(`${socket.user.id}.order: finished`, () => {
+            socket.emit('order: finished')
+        })
+    }
 
-    socket.on('ready for data', (data) => {
-        console.log('Client is ready for data:', data);
-    });
+    const handleNotification = (data) => {
+        notificationHandler(socket, data)
+    }
+
+    socket.on("ready for data", () => {
+        client.on("notification", handleNotification)
+    })
+    socket.on("messageSeen", (data) => {
+        io.sockets.emit("messageSeen", data)
+    })
 
     socket.on("disconnect", () => {
-        process.removeListener(orderCreated, eventFunction);
-    });
-});
+        process.removeAllListeners("order: created")
+        process.removeAllListeners("order: accepted")
+        process.removeAllListeners("order: started")
+        process.removeAllListeners("order: finished")
+    })
+})
 
 const User = new UserModule(io, server, router, protectedRouter, adminRouter, db)
 const Auth = new AuthModule(router, protectedRouter, db, bcrypt)

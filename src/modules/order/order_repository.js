@@ -191,7 +191,7 @@ class OrderRepository {
                 u.email
                 FROM "user".orders o
                 LEFT JOIN "user".users u ON o.customer_id = u.id
-                WHERE o.status_id = 1;`
+                WHERE o.status_id = 1 AND o.canceled IS false;`
         };
 
         try {
