@@ -258,12 +258,14 @@ class OrderRepository {
     async startActiveOrder({ orderId }) {
         const updateQuery = {
             text: `UPDATE "user".orders
-             SET status_id = $2
+             SET status_id = $2,
+                 ride_started = $3
              WHERE id = $1
              RETURNING *`,
             values: [
                 orderId,
                 3, // need to put 3
+                "NOW()"
             ],
         };
 
@@ -285,12 +287,14 @@ class OrderRepository {
     async endActiveOrder({ orderId }) {
         const updateQuery = {
             text: `UPDATE "user".orders
-             SET status_id = $2
+             SET status_id = $2,
+                 ride_ended = $3
              WHERE id = $1
              RETURNING *`,
             values: [
                 orderId,
                 4, // need to put 3
+                "NOW()"
             ],
         };
 
@@ -312,13 +316,14 @@ class OrderRepository {
     async setOrderAsFinished({ orderId, isPaid, exactPrice }){
         const updateQuery = {
             text: `UPDATE "user".orders
-             SET is_successful_payment = $2, exact_price = $3, ride_ended = CURRENT_TIMESTAMP
+             SET status_id = $4, is_successful_payment = $2, exact_price = $3, ride_ended = CURRENT_TIMESTAMP
              WHERE id = $1
              RETURNING *`,
             values: [
                 orderId,
                 isPaid,
-                exactPrice
+                exactPrice,
+                4
             ],
         };
 

@@ -7,6 +7,10 @@ class PaymentRoutes {
         this.middleware = middleware
 
         this.protected
+            .route("/order/:rideId/createPaymentIntent")
+            .post((req, res, next) => this.handlers.createPaymentIntentHandler(req, res).catch(next))
+
+        this.protected
             .route("/order/pay/:rideId")
             .post((req, res, next) => this.handlers.payOrderHandler(req, res).catch(next))
 

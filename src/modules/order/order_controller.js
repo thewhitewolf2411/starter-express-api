@@ -38,7 +38,7 @@ class OrderController extends WithLogger {
 
     calculatePriceEstimate(distance){
         const taxiStartPrice = 2.5
-        const pricePerKilometer = distance * 1.5
+        const pricePerKilometer = distance * 1.5 * 1.2
 
         const total = taxiStartPrice + pricePerKilometer
 
@@ -47,7 +47,7 @@ class OrderController extends WithLogger {
 
     async createOrderHandler(req, res){
         const { id: customerId } = req.user
-        const { startingCoordinates, endingCoordinates, estimatedPrice, isPetFriendly, isCardPayment, reminder } = req.body
+        const { startingCoordinates, estimatedPrice, endingCoordinates, isPetFriendly, isCardPayment, reminder } = req.body
         const startLongitude = startingCoordinates.lng
         const startLatitude = startingCoordinates.lat
         const endLongitude = endingCoordinates.lng
@@ -162,9 +162,14 @@ class OrderController extends WithLogger {
         if (err) throw err
         const { statusId, driverId: orderDriverId } = order
 
+        const isPaid = order.cardPayment ? false : true
+
+        console.log(order)
+        const exactPrice = this.calculateFinalPrice(order.estimatedPrice, new Date(order.rideStarted), new Date())
+
         if (statusId === 3 && orderDriverId === driverId) {
-            const [finishedOrderError, finishedOrder] = await this.repo.endActiveOrder({ orderId })
-            if (finishedOrder) process.emit(`${finishedOrder.customerId}.order: finished`, { finishedOrder })
+            const [finishedOrderError, finishedOrder] = await this.repo.setOrderAsFinished({ orderId, isPaid, exactPrice })
+            if (finishedOrder) process.emit(`${finishedOrder.customerId}.order: ended`, { finishedOrder })
             res.status(201).send({ finishedOrder })
             return
         }
@@ -175,23 +180,23 @@ class OrderController extends WithLogger {
     async endActiveOrderHandler(req, res){
         const { rideId: orderId } = req.params
         const { id: driverId } = req.user
-        const { exactPrice } = req.body
 
         const [err, order] = await this.repo.getOrderById({ orderId })
         if (err) throw err
         const { statusId, driverId: orderDriverId } = order
 
-        const isPaid = !order.cardPayment
-
-        if (statusId === 4 && orderDriverId === driverId) {
-            const [finishedOrderError, finishedOrder] = await this.repo.setOrderAsFinished({ orderId, isPaid, exactPrice })
-            if (finishedOrder) process.emit(`${finishedOrder.customerId}.order: ended`, { finishedOrder })
-            res.status(201).send({ finishedOrder })
-            return
-        }
+        const isPaid = order.cardPayment ? false : true
 
         res.status(200)
         return
+    }
+
+    calculateFinalPrice(estimatedPrice, rideStarted, rideEnded){
+        const totalMinutes = (rideEnded - rideStarted) / (1000 * 60)
+
+        const finalPrice = Number(estimatedPrice) + 0.1 * totalMinutes
+        
+        return Math.round(finalPrice * 100) / 100
     }
 }
 

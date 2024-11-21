@@ -21,9 +21,14 @@ class PaymentController extends WithLogger {
     }
 
     async payOrderHandler(req, res){
+
         const { rideId: orderId } = req.params
 
-        const data = {
+        this.repo.orderPaid({ orderId })
+
+        res.status(200).send({message: "ok"})
+
+        /* const data = {
             amount: 100, // minor units = 1EUR
             // unique order identifier
             order_number: 'random' + Date.now(),
@@ -62,7 +67,84 @@ class PaymentController extends WithLogger {
             } catch (error) {
                 console.error({ client_secret: null, status: 'declined', error: error.message });
             }
-        })();
+        })(); */
+    }
+
+    async createPaymentIntentHandler(req, res){
+
+        const { rideId: orderId } = req.params
+
+        const order = await classRegistry.get("Order").getOrderById(orderId)
+
+        const { exactPrice, customerId } = order
+
+        const [err, user] = await classRegistry.get("User").getUserById({userId: customerId})
+ 
+        try {
+            const { firstName, lastName, email, phoneNumber } = user
+
+            const orderNumber = "0cba9a96aec4f8c"
+            const amount = exactPrice * 100
+
+            const requestBody = JSON.stringify({
+                "transaction_type": "purchase",
+                "amount": amount,
+                "currency": "BAM",
+                "order_number": orderNumber,
+                "order_info": "Taxi Order",
+                "language": ["bs"],
+                "ch_full_name": firstName + " " + lastName,
+                "ch_address": "",
+                "ch_city": "",
+                "ch_zip": "",
+                "ch_country": "BH",
+                "ch_phone": phoneNumber,
+                "ch_email": email,
+                "supported_payment_methods": ["card"],
+            })
+
+            const merchantKey = "key-b84363ffa3b6448663f3f9f3dee6ff6a";
+            const authenticityToken = "40d23add07f9ddcdb67512ea35e24799b35921e3";
+            const monriBaseUrl = "https://ipgtest.monri.com";
+            const fullPath = "/v2/payment/new";
+            const timestamp = (new Date()).getTime();
+    
+            // Create digest for Authorization header
+            const digest = crypto.createHash('sha512')
+                .update(merchantKey + timestamp + authenticityToken + requestBody)
+                .digest("hex");
+            const authorization = `WP3-v2 ${authenticityToken} ${timestamp} ${digest}`;
+
+            try {
+                const response = await fetch(`${monriBaseUrl}${fullPath}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': authorization
+                    },
+                    body: requestBody
+                });
+
+                const result = await response.json();
+
+                console.log(result)
+
+                if (response.ok) {
+                    res.status(201).send({ status: 'approved', client_secret: result.client_secret });
+                } else {
+                    res.status(500).send({ client_secret: null, status: 'declined', error: result });
+                }
+            } catch (error) {
+                console.log("fuck it")
+                console.log(error)
+            }
+        } catch (e) {
+            console.log("fuck it twice")
+            console.log(e)
+        }
+
+
+        res.status(200)
     }
 
 }
