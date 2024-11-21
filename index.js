@@ -35,7 +35,7 @@ app.use(httpLogger)
 app.use(cors())
 
 app.get("/test", (req, res) => {
-    res.sendFile(`${__dirname}/index.html`)
+    res.sendFile(`${__dirname}/src/index.html`)
 })
 
 // Check jwt for protectedRouter
